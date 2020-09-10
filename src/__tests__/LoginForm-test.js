@@ -9,9 +9,7 @@ test('successful login', async () => {
   login.mockResolvedValue(true);
 
   let onSuccess = jest.fn();
-  let { getByTestId, findByTestId } = render(
-    <LoginForm onSuccess={onSuccess} />,
-  );
+  let { getByTestId } = render(<LoginForm onSuccess={onSuccess} />);
 
   let usernameField = getByTestId('username');
   let passwordField = getByTestId('password');
@@ -30,11 +28,14 @@ test('successful login', async () => {
 test('login error message', async () => {
   login.mockRejectedValue(new Error('Forbidden'));
 
-  let { getByTestId, findByTestId } = render(<LoginForm />);
+  let { getByTestId } = render(<LoginForm />);
 
   let submitButton = getByTestId('submit');
-  fireEvent.click(submitButton);
 
-  let errorMessage = await findByTestId('error');
+  await act(async () => {
+    fireEvent.click(submitButton);
+  });
+
+  let errorMessage = getByTestId('error');
   expect(errorMessage).toHaveTextContent(/forbidden/i);
 });
